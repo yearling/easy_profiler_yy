@@ -229,7 +229,7 @@ public:
     ~BlocksGraphicsView() override;
 
     // Public virtual methods
-
+    bool event(QEvent *event) override;
     void enterEvent(QEvent* _event) override;
     void leaveEvent(QEvent* _event) override;
     void wheelEvent(QWheelEvent* _event) override;
@@ -296,7 +296,7 @@ private:
     void scaleTo(qreal _scale);
     void scrollTo(const GraphicsBlockItem* _item);
     qreal mapToDiagram(qreal x) const;
-    void onWheel(qreal _scenePos, int _wheelDelta);
+    void onWheel(qreal _scenePos, float _wheelDelta);
     qreal setTree(GraphicsBlockItem* _item, const ::profiler::BlocksTree::children_t& _children, qreal& _height, uint32_t& _maxDepthChild, qreal _y, short _level);
 
     void revalidateOffset();
@@ -356,7 +356,8 @@ public:
         return PROF_FROM_MICROSECONDS(_pos);
         //return PROF_FROM_MILLISECONDS(_pos);
     }
-
+    qreal initialDistance;
+    bool touchValid;
 }; // END of class BlocksGraphicsView.
 
 //////////////////////////////////////////////////////////////////////////

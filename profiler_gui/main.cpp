@@ -58,6 +58,14 @@
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 #endif
 
+void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    // Handle the log message as per your requirements
+    // ...
+    
+    // Example: Log the message using qDebug
+}
+
 int main(int argc, char **argv)
 {
     auto now = ::std::chrono::duration_cast<std::chrono::seconds>(::std::chrono::system_clock::now().time_since_epoch()).count() >> 1;
@@ -65,7 +73,7 @@ int main(int argc, char **argv)
 
     // Instanciate thread pool to avoid data races for compilers without C++11 thread-safe statics
     ThreadPool::instance();
-
+    qInstallMessageHandler(customMessageHandler);
     QApplication app(argc, argv);
 
     // Instanciate easy globals after QApplication to allow creation of global fonts, and on the main thread to avoid data races

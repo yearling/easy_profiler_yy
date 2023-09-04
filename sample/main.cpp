@@ -10,7 +10,7 @@
 #include <easy/profiler.h>
 #include <easy/arbitrary_value.h>
 #include <easy/reader.h>
-
+#define SAMPLE_NETWORK_TEST
 std::condition_variable cv;
 std::mutex cv_m;
 int g_i = 0;

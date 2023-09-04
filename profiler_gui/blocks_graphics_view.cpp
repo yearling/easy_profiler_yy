@@ -79,7 +79,8 @@
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QWheelEvent>
-
+#include <QGesture>
+#include <QMouseEvent>
 #include "arbitrary_value_tooltip.h"
 #include "blocks_graphics_view.h"
 #include "bookmarks_editor.h"
@@ -703,6 +704,9 @@ BlocksGraphicsView::BlocksGraphicsView(QWidget* _parent)
     initMode();
     setScene(new QGraphicsScene(this));
     updateVisibleSceneRect();
+//    setAttribute(Qt::WA_AcceptTouchEvents);
+    grabGesture(Qt::PanGesture);
+    grabGesture(Qt::PinchGesture);
 }
 
 BlocksGraphicsView::~BlocksGraphicsView()
@@ -1317,17 +1321,100 @@ void BlocksGraphicsView::leaveEvent(QEvent* _event)
 
 void BlocksGraphicsView::wheelEvent(QWheelEvent* _event)
 {
-    if (needToIgnoreMouseEvent())
-        return;
-
-    m_idleTime = 0;
-
-    if (!m_bEmpty)
-        onWheel(mapToDiagram(mapToScene(_event->pos()).x()), _event->delta());
-
-    _event->accept();
+    if(_event->modifiers() & Qt::ShiftModifier)
+    {
+        {
+            if (needToIgnoreMouseEvent())
+                return;
+            
+            m_idleTime = 0;
+            
+            if (!m_bEmpty)
+                onWheel(mapToDiagram(mapToScene(_event->pos()).x()), _event->delta());
+            
+            _event->accept();
+        }
+    }
 }
+bool BlocksGraphicsView::event(QEvent *event)
+{
+//    if (event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd || event->type() == QEvent::TouchCancel) {
+//        QTouchEvent *touchEvent = static_cast<QTouchEvent*>(event);
+//        QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+//
+//        if (touchPoints.count() >= 2) {
+//            // Calculate the distance between the first two touch points
+//            qreal currentDistance = QLineF(touchPoints[0].pos(), touchPoints[1].pos()).length();
+//            if (event->type() == QEvent::TouchBegin) {
+//                initialDistance = currentDistance;
+//                touchValid = true;
+//            }
+//            if (event->type() == QEvent::TouchEnd || event->type() == QEvent::TouchCancel)
+//            {
+//                touchValid = false;
+//            }
+//            else if (event->type() == QEvent::TouchUpdate) {
+//                if(!touchValid)
+//                {
+//                    initialDistance = currentDistance;
+//                    touchValid = true;
+//                }
+//                qreal scaleFactor = currentDistance / initialDistance;
+//
+//                QPoint touchPoint((int)touchPoints[0].pos().rx(),(int)touchPoints[0].pos().ry());
+//                if (scaleFactor > 1.0) {
+//                    // Zoom In
+////                    qDebug() << "Zoom In";
+//                    onWheel(mapToDiagram(mapToScene(touchPoint).x()), 1);
+//                }
+//                else if (scaleFactor < 1.0) {
+//                    onWheel(mapToDiagram(mapToScene(touchPoint).x()), -1);
+//                            qDebug() << "Zoom Out";
+//                }
+//            }
+//        }
+//        return true;
+//    }
+    if (event->type() == QEvent::Wheel )
+    {
+        // Check if the event originated from the touch bar mouse wheel
+       
+    }
 
+    if (event->type() == QEvent::Gesture)
+    {
+        QGestureEvent* gestureEvent = static_cast<QGestureEvent*>(event);
+        if (QGesture *swipe = gestureEvent->gesture(Qt::SwipeGesture))
+        {
+            //swipeTriggered(static_cast<QSwipeGesture *>(swipe));
+            qDebug() <<"yy swip";
+        }
+        if (QGesture *pan = gestureEvent->gesture(Qt::PanGesture))
+        {
+            //panTriggered(static_cast<QPanGesture *>(pan));
+            qDebug() <<"yy pan";
+        }
+        if (QGesture *pinch = gestureEvent->gesture(Qt::PinchGesture))
+        {
+            //    pinchTriggered(static_cast<QPinchGesture *>(pinch));
+            QPinchGesture* pinchGuesture = static_cast<QPinchGesture *>(pinch);
+            
+            qDebug() <<"yy pinch"<<pinchGuesture->scaleFactor();
+            QPointF centPose = pinchGuesture->centerPoint();
+            QPoint touchPoint(centPose.x(),centPose.y());
+            if(pinchGuesture->scaleFactor() > 1.0)
+            {
+                onWheel(mapToDiagram(mapToScene(touchPoint).x()), 1);
+            }
+            else
+            {
+                onWheel(mapToDiagram(mapToScene(touchPoint).x()), -1);
+            }
+        }
+        return true;
+    }
+    return QWidget::event(event);
+}
 void BlocksGraphicsView::onGraphicsScrollbarWheel(qreal _scenePos, int _wheelDelta)
 {
     m_idleTime = 0;
@@ -1357,7 +1444,7 @@ qreal BlocksGraphicsView::mapToDiagram(qreal x) const
     return m_offset + x / m_scale;
 }
 
-void BlocksGraphicsView::onWheel(qreal _scenePos, int _wheelDelta)
+void BlocksGraphicsView::onWheel(qreal _scenePos, float _wheelDelta)
 {
     const decltype(m_scale) scaleCoeff = _wheelDelta > 0 ? profiler_gui::SCALING_COEFFICIENT : profiler_gui::SCALING_COEFFICIENT_INV;
 

@@ -85,7 +85,7 @@ if (Qt5Widgets_FOUND)
         DESTINATION
         bin
     )
-
+    set_target_properties(profiler_gui PROPERTIES MACOSX_BUNDLE ON)
     set_property(TARGET profiler_gui PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
 else ()
     message(STATUS "INFO\n\n\tQt5 not found! Generating EasyProfiler projects without GUI.\n")

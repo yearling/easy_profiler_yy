@@ -1,3 +1,10 @@
+# 编译步骤
+1. brew install qt@5
+2. echo 'export PATH="/usr/local/opt/qt@5/bin:$PATH"' >> ~/.zshrc
+3. mkdir build
+4. cd build
+5. cmake -DCMAKE_PREFIX_PATH=/usr/local/opt/qt@5/lib/cmake/Qt5Widgets/ ..  -G Xcode
+6. 打开xcode工程，编译gui工具
 # easy_profiler [![2.1.0](https://img.shields.io/badge/stable-2.1.0-009688.svg)](https://github.com/yse/easy_profiler/releases/tag/v2.1.0) [![2.x.x](https://img.shields.io/badge/latest-2.x.x-f57f17.svg)](https://github.com/yse/easy_profiler)
 
 [![Build Status](https://travis-ci.com/yse/easy_profiler.svg?branch=develop)](https://travis-ci.com/yse/easy_profiler)

@@ -51,6 +51,7 @@ The Apache License, Version 2.0 (the "License");
 // DISABLE_EASY_PROFILER may be defined manually in source-file before #include <easy/profiler.h>
 //                       to disable profiler for certain source-file or project.
 //
+#define BUILD_WITH_EASY_PROFILER
 
 #if defined(BUILD_WITH_EASY_PROFILER) && !defined(DISABLE_EASY_PROFILER)
 
